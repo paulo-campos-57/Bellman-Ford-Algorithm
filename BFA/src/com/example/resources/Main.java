@@ -1,20 +1,51 @@
 package com.example.resources;
 
+import java.util.Scanner;
+
 public class Main {
 
-    public static void main(String[] args) {
-        Graph graph = new Graph(5); 
-        
-        graph.addEdge(0, 1, 6);
-        graph.addEdge(0, 2, 7);
-        graph.addEdge(1, 2, 8);
-        graph.addEdge(1, 3, 5);
-        graph.addEdge(1, 4, -4);
-        graph.addEdge(2, 3, -3);
-        graph.addEdge(2, 4, 9);
-        graph.addEdge(3, 1, -2);
-        graph.addEdge(4, 3, 7);
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
+    }
 
-        graph.bellmanFord(0);
+    @SuppressWarnings("ConvertToTryWithResources")
+    public static void main(String[] args) {
+        clearScreen();
+        Scanner in = new Scanner(System.in);
+
+        System.out.print("Informe a quantidade de vértices: ");
+        int vertexQtd = in.nextInt();
+        System.out.print("Informe a quantidade de arestas: ");
+        int edgeQtd = in.nextInt();
+
+        Graph graph = new Graph(vertexQtd);
+
+        for (int i = 0; i < edgeQtd; i++) {
+            System.out.println("Aresta: " + (i + 1));
+            System.out.print("Informe o vértice de origem: ");
+            int originVertex = in.nextInt();
+            System.out.print("Informe o vértice de destino: ");
+            int destinyVertex = in.nextInt();
+            System.out.print("Informe o peso da aresta: ");
+            int vertexWeight = in.nextInt();
+            graph.addEdge(originVertex, destinyVertex, vertexWeight);
+        }
+
+        int source;
+        while (true) {
+            System.out.print("Informe o vértice de origem para o algoritmo de Bellman-Ford: ");
+            source = in.nextInt();
+
+            if (source >= 0 && source < vertexQtd) {
+                break;
+            } else {
+                System.out.println("Erro: Vértice de origem inválido! Insira um número entre 0 e " + (vertexQtd - 1));
+            }
+        }
+
+        graph.bellmanFord(source);
+
+        in.close();
     }
 }

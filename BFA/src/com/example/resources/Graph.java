@@ -6,6 +6,7 @@ import java.util.List;
 public class Graph {
 
     private List<Edges> edges = new ArrayList<>();
+    @SuppressWarnings("FieldMayBeFinal")
     private int vertex;
 
     public Graph(int vertex) {
@@ -34,16 +35,16 @@ public class Graph {
 
         for (int i = 1; i < vertex; i++) {
             for (Edges edge : edges) {
-                if (distance[edge.getOrigin()] != Integer.MAX_VALUE &&
-                        distance[edge.getOrigin()] + edge.getWeight() < distance[edge.getDestiny()]) {
+                if (distance[edge.getOrigin()] != Integer.MAX_VALUE
+                        && distance[edge.getOrigin()] + edge.getWeight() < distance[edge.getDestiny()]) {
                     distance[edge.getDestiny()] = distance[edge.getOrigin()] + edge.getWeight();
                 }
             }
         }
 
         for (Edges edge : edges) {
-            if (distance[edge.getOrigin()] != Integer.MAX_VALUE &&
-                    distance[edge.getOrigin()] + edge.getWeight() < distance[edge.getDestiny()]) {
+            if (distance[edge.getOrigin()] != Integer.MAX_VALUE
+                    && distance[edge.getOrigin()] + edge.getWeight() < distance[edge.getDestiny()]) {
                 System.out.println("Ciclo negativo detectado!");
                 return;
             }
