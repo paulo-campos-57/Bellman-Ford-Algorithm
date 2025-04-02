@@ -6,6 +6,12 @@ public class Edges {
     private int destiny;
     private int weight;
 
+    public Edges(int origin, int destiny, int weight) {
+        this.origin = origin;
+        this.destiny = destiny;
+        this.weight = weight;
+    }
+
     public int getOrigin() {
         return origin;
     }
