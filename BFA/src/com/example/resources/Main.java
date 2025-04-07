@@ -1,8 +1,7 @@
 package com.example.resources;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Main {
 
@@ -21,102 +20,73 @@ public class Main {
         }
     }
 
-    public static void loadExampleGraph(Graph graph) {
-        System.out.println("Carregando exemplo de rotas com pedágios e bônus...");
-
-        graph.addEdge(0, 1, 6);
-        graph.addEdge(0, 2, 5);
-        graph.addEdge(1, 3, -2);
-        graph.addEdge(2, 1, -1);
-        graph.addEdge(2, 3, 1);
-        graph.addEdge(3, 4, -2);
-        graph.addEdge(4, 5, 3);
-
-        System.out.println("Grafo de exemplo carregado com sucesso!");
-        pause();
-    }
-
-    public static void printGraph(Graph graph, int vertexQtd) {
-        System.out.println("\n=== Lista de Vértices ===");
-        for (int i = 0; i < vertexQtd; i++) {
-            System.out.println("Vértice: " + i);
-        }
-
-        System.out.println("\n=== Lista de Arestas ===");
-        List<Edges> edges = graph.getEdges();
-        for (Edges edge : edges) {
-            System.out.println("Origem: " + edge.getOrigin()
-                    + ", Destino: " + edge.getDestiny()
-                    + ", Peso: " + edge.getWeight());
-        }
-    }
-
     @SuppressWarnings("ConvertToTryWithResources")
     public static void main(String[] args) {
-        clearScreen();
         Scanner in = new Scanner(System.in);
-
-        System.out.println("==== ALGORITMO DE BELLMAN-FORD ====");
-        System.out.println("Escolha uma opção:");
-        System.out.println("1. Criar grafo manualmente");
-        System.out.println("2. Usar problema de exemplo (rotas com pedágios e bônus)");
-        System.out.print("Opção: ");
-        int option = in.nextInt();
         clearScreen();
 
-        Graph graph;
-        int vertexQtd;
+        Map<String, Integer> nameToIndex = new HashMap<>();
+        Map<Integer, String> indexToName = new HashMap<>();
 
-        if (option == 1) {
-            System.out.print("Informe a quantidade de vértices: ");
-            vertexQtd = in.nextInt();
-            System.out.print("Informe a quantidade de arestas: ");
-            int edgeQtd = in.nextInt();
-            clearScreen();
+        System.out.println("==== ROTAS COM PEDÁGIOS (ALGORITMO DE BELLMAN-FORD) ====");
+        System.out.print("Informe a quantidade de pontos (cidades, cruzamentos etc): ");
+        int vertexQtd = in.nextInt();
+        in.nextLine(); // limpa buffer
 
-            graph = new Graph(vertexQtd);
+        for (int i = 0; i < vertexQtd; i++) {
+            System.out.print("Nome do ponto " + (i + 1) + ": ");
+            String name = in.nextLine().trim();
+            nameToIndex.put(name, i);
+            indexToName.put(i, name);
+        }
 
-            for (int i = 0; i < edgeQtd; i++) {
-                System.out.println("Aresta: " + (i + 1));
-                System.out.print("Informe o vértice de origem: ");
-                int originVertex = in.nextInt();
-                System.out.print("Informe o vértice de destino: ");
-                int destinyVertex = in.nextInt();
-                System.out.print("Informe o peso da aresta: ");
-                int vertexWeight = in.nextInt();
-                graph.addEdge(originVertex, destinyVertex, vertexWeight);
-                System.out.println("");
-                System.out.println("Aresta " + (i + 1) + ":");
-                System.out.println("Vértice de origem: " + originVertex);
-                System.out.println("Vértice de destino: " + destinyVertex);
-                System.out.println("Peso da aresta: " + vertexWeight);
-                pause();
-                clearScreen();
+        System.out.print("Informe a quantidade de rotas entre os pontos: ");
+        int edgeQtd = in.nextInt();
+        in.nextLine();
+
+        Graph graph = new Graph(vertexQtd);
+
+        for (int i = 0; i < edgeQtd; i++) {
+            System.out.println("\nRota " + (i + 1) + ":");
+            System.out.print("Ponto de origem: ");
+            String origin = in.nextLine().trim();
+            System.out.print("Ponto de destino: ");
+            String destiny = in.nextLine().trim();
+            System.out.print("Preço do pedágio (pode ser negativo se for bônus): ");
+            int weight = in.nextInt();
+            in.nextLine();
+
+            if (!nameToIndex.containsKey(origin) || !nameToIndex.containsKey(destiny)) {
+                System.out.println("Erro: Um dos pontos informados não existe!");
+                i--;
+                continue;
             }
 
-            int source;
-            while (true) {
-                System.out.print("Informe o vértice de origem para o algoritmo de Bellman-Ford: ");
-                source = in.nextInt();
+            graph.addEdge(nameToIndex.get(origin), nameToIndex.get(destiny), weight);
+        }
 
-                if (source >= 0 && source < vertexQtd) {
-                    break;
-                } else {
-                    System.out.println("Erro: Vértice de origem inválido! Insira um número entre 0 e " + (vertexQtd - 1));
-                }
+        System.out.print("\nInforme o ponto de partida: ");
+        String sourceName = in.nextLine().trim();
+
+        if (!nameToIndex.containsKey(sourceName)) {
+            System.out.println("Erro: ponto de partida inválido!");
+            in.close();
+            return;
+        }
+
+        int sourceIndex = nameToIndex.get(sourceName);
+
+        System.out.println("\nCalculando menores custos a partir de " + sourceName + "...\n");
+        int[] distances = graph.bellmanFord(sourceIndex);
+
+        System.out.println("\n==== Resultados ====");
+        for (int i = 0; i < vertexQtd; i++) {
+            String destino = indexToName.get(i);
+            if (distances[i] == Integer.MAX_VALUE) {
+                System.out.println("Para " + destino + " -> Inacessível");
+            } else {
+                System.out.println("Para " + destino + " -> Custo total: " + distances[i]);
             }
-
-            clearScreen();
-            graph.bellmanFord(source);
-        } else {
-            vertexQtd = 6;
-            graph = new Graph(vertexQtd);
-            loadExampleGraph(graph);
-            clearScreen();
-            printGraph(graph, vertexQtd);
-            System.out.print("Informe o ponto de partida do vértice: ");
-            int source = in.nextInt();
-            graph.bellmanFord(source);
         }
 
         in.close();

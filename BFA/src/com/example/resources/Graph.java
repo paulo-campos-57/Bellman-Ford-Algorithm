@@ -1,6 +1,7 @@
 package com.example.resources;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Graph {
@@ -26,11 +27,9 @@ public class Graph {
         return vertex;
     }
 
-    public void bellmanFord(int source) {
+    public int[] bellmanFord(int source) {
         int[] distance = new int[vertex];
-        for (int i = 0; i < vertex; i++) {
-            distance[i] = Integer.MAX_VALUE;
-        }
+        Arrays.fill(distance, Integer.MAX_VALUE);
         distance[source] = 0;
 
         for (int i = 1; i < vertex; i++) {
@@ -46,14 +45,11 @@ public class Graph {
             if (distance[edge.getOrigin()] != Integer.MAX_VALUE
                     && distance[edge.getOrigin()] + edge.getWeight() < distance[edge.getDestiny()]) {
                 System.out.println("Ciclo negativo detectado!");
-                return;
+                return distance;
             }
         }
 
-        System.out.println("Distâncias mínimas a partir do vértice " + source + ":");
-        for (int i = 0; i < vertex; i++) {
-            System.out.println("Para " + i + " -> " + (distance[i] == Integer.MAX_VALUE ? "Infinito" : distance[i]));
-        }
+        return distance;
     }
 
 }
